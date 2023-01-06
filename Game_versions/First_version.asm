@@ -319,7 +319,7 @@ lim_derecho 	equ		30
         xor di,di
         mov di,0FFFFh
         paso1:  
-            mov cx,15
+            mov cx,12
         paso2:
             loop paso2
         dec di
@@ -1256,9 +1256,14 @@ endp
         ; Transformación de número de casilla en índice
         dec [posicion_colision]
 
-        ; Ahora verificar en esa casilla si está o no prendido
+        ; Agregando el numero para colisión
         mov bx,[posicion_colision]
-        mov [matriz_colisiones+bx],1
+        xor ax,ax
+        mov al,[color_pieza_caracter]
+        xor dx,dx
+        mov dx,10
+        mul dl
+        mov [matriz_colisiones+bx],al
 
         mov [si],cl ; Devolviendo los valores originales 
         mov [di],ch
@@ -1270,48 +1275,10 @@ endp
 ;---------------------------
 ;-- Sección para checar si es necesario eliminar un renglón, esto se hace cada vez que es colocada una pieza
 ;---------------------------
-    CHECAR_ELIMINAR_RENGLON proc
+    
+
+    ELIMINAR_RENGLONES proc
         
-        ; En este caso se tendrá que recorrer el último renglón, en caso que esté lleno se va a recorrer el renglón de arriba
-        mov [posicion],0h   ; Este sirve para acceder a una fila en especial
-        mov [crenglones],1   ;-> Este sirve de contador para columnas
-        mov [cfilas],1
-        mov [fila_llena],1
-
-
-        ; Se inicia a recorrer todas las filas para saber si está llena, en caso que sí se baja el reglón de arriba
-
-        recorrer_filas: 
-            recorrer_colummas:
-                ; Verificando si esta llena esa celda o no
-                mov [posicion],[cfilas]
-                dec [posicion]
-                mov ax,[posicion]
-                mov bx,28
-                mul bx
-                mov [posicion],ax
-                xor bx,bx
-                mov bl,[crenglones]
-                add [posicion],bl
-                mov bx,[posicion]
-
-                cmp [matriz_colisiones+bx],0
-                jz
-
-                inc [crenglones]
-                cmp [crenglones],28h
-                jz salir_columnas
-
-            
-            salir_columnas:
-            inc [cfilas]
-            
-            cmp [cfilas],23
-            jz salir_filas
-            
-            loop recorrer_filas
-        
-        salir_filas:
         ret
     endp
 
